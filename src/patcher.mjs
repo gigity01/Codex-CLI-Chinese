@@ -35,7 +35,11 @@ function rustString(value) {
 }
 
 export function validateCatalog(catalog) {
-  if (catalog.schemaVersion !== 1 || catalog.locale !== "zh-CN") {
+  if (
+    catalog.schemaVersion !== 1 ||
+    typeof catalog.locale !== "string" ||
+    !/^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(catalog.locale)
+  ) {
     throw new Error("Unsupported locale catalog schema");
   }
   const messages = new Map();

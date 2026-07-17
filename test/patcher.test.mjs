@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { patchSource } from "../src/patcher.mjs";
+import { patchSource, validateCatalog } from "../src/patcher.mjs";
 
 const catalog = {
   schemaVersion: 1,
@@ -85,5 +85,19 @@ test("path traversal is rejected", async () => {
       write: false,
     }),
     /escapes the source tree/,
+  );
+});
+
+test("catalog validation accepts future supported language tags", () => {
+  for (const locale of ["zh-CN", "ja-JP", "ko-KR"]) {
+    const messages = validateCatalog({ ...catalog, locale });
+    assert.equal(messages.get("sample").target, "你好");
+  }
+});
+
+test("catalog validation rejects malformed language tags", () => {
+  assert.throws(
+    () => validateCatalog({ ...catalog, locale: "../../ja-JP" }),
+    /Unsupported locale catalog schema/,
   );
 });

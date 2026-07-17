@@ -1,6 +1,7 @@
 dist/
 out/
 build/
+artifacts/
 coverage/
 *.log
 *.tmp
