@@ -9,7 +9,8 @@
     "commitSha": "78ad6e6bfd1d3b6a209acd3ef82172a96b25179c",
     "sourceArchiveSha256": "48a429a607cd51d06c1fa802186e02adacd145b0a6e2b7ec7b940d8e237cdc05",
     "rustToolchain": "1.95.0",
-    "target": "x86_64-pc-windows-msvc"
+    "target": "x86_64-pc-windows-msvc",
+    "lockfileWorkspaceVersionFrom": "0.0.0"
   },
   "operations": [
     { "id": "slash.feedback", "messageId": "slash.feedback", "file": "codex-rs/tui/src/slash_command.rs", "expectedMatches": 1 },

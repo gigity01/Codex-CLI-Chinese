@@ -63,6 +63,14 @@ jobs:
         run: |
           rustup toolchain install '${{ steps.adapter.outputs.rust }}' --profile minimal
 
+      - name: Refresh release workspace versions in lockfile
+        shell: pwsh
+        run: |
+          .\scripts\Prepare-UpstreamLock.ps1 `
+            -Version $env:CODEX_VERSION `
+            -RustToolchain '${{ steps.adapter.outputs.rust }}' `
+            -UpstreamRoot .\upstream
+
       - name: Build release executable
         shell: pwsh
         working-directory: upstream/codex-rs

@@ -32,9 +32,10 @@
 2. 拉取适配器声明的官方 commit。
 3. 运行补丁器单元测试和上游源码集成测试。
 4. 拒绝缺失、重复或发生漂移的文本锚点。
-5. 编译 release EXE 并执行 `--version` 校验。
-6. 生成 SHA-256、构建清单和 GitHub Artifact Attestation。
-7. 上传包含安装与卸载脚本的 Artifact。
+5. 仅允许把发布占位 workspace 版本从 `0.0.0` 刷新到目标版本，其他锁文件变化会失败。
+6. 使用刷新后的锁文件执行 `--locked` release 编译并校验 `--version`。
+7. 生成 SHA-256、构建清单和 GitHub Artifact Attestation。
+8. 上传包含安装与卸载脚本的 Artifact。
 
 构建不读取或上传本机 `CODEX_HOME`、登录令牌、聊天记录和账号配置，也不需要仓库 Secret。
 

@@ -5,7 +5,7 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $scripts = @(
     'Build.ps1', 'Check-Version.ps1', 'Cleanup-LocalBuildTools.ps1',
-    'Install.ps1', 'Package-CI.ps1', 'Uninstall.ps1'
+    'Install.ps1', 'Package-CI.ps1', 'Prepare-UpstreamLock.ps1', 'Uninstall.ps1'
 )
 
 foreach ($name in $scripts) {
