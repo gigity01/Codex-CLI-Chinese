@@ -15,7 +15,7 @@ Copy-Item -LiteralPath $lockFile -Destination $backup
 try {
     Push-Location $cargoRoot
     try {
-        & rustup run $RustToolchain cargo metadata --no-deps --format-version 1 | Out-Null
+        & rustup run $RustToolchain cargo metadata --format-version 1 | Out-Null
         if ($LASTEXITCODE -ne 0) { throw 'Cargo metadata failed while refreshing workspace lock versions.' }
     } finally {
         Pop-Location
