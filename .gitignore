@@ -1,0 +1,7 @@
+dist/
+out/
+build/
+coverage/
+*.log
+*.tmp
+work/

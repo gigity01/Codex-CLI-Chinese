@@ -1,0 +1,88 @@
+name: Build Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      codex_version:
+        description: Exact supported Codex CLI version
+        required: true
+        default: 0.144.3
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 180
+    env:
+      CODEX_VERSION: ${{ inputs.codex_version }}
+      CARGO_INCREMENTAL: "0"
+      CARGO_TERM_COLOR: always
+
+    steps:
+      - name: Checkout localization project
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Resolve exact adapter
+        id: adapter
+        shell: pwsh
+        run: |
+          $path = "resources/adapters/codex-$env:CODEX_VERSION.json"
+          if (-not (Test-Path -LiteralPath $path)) { throw "Unsupported Codex version: $env:CODEX_VERSION" }
+          $adapter = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json
+          "commit=$($adapter.upstream.commitSha)" >> $env:GITHUB_OUTPUT
+          "rust=$($adapter.upstream.rustToolchain)" >> $env:GITHUB_OUTPUT
+
+      - name: Checkout exact official Codex source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: openai/codex
+          ref: ${{ steps.adapter.outputs.commit }}
+          path: upstream
+          persist-credentials: false
+
+      - name: Verify adapter and apply localization
+        shell: pwsh
+        env:
+          CODEX_UPSTREAM_SOURCE: ${{ github.workspace }}\upstream
+        run: |
+          node --version
+          npm test
+          node .\src\cli.mjs check --source .\upstream
+          node .\src\cli.mjs apply --source .\upstream
+
+      - name: Install exact Rust toolchain
+        shell: pwsh
+        run: |
+          rustup toolchain install '${{ steps.adapter.outputs.rust }}' --profile minimal
+
+      - name: Build release executable
+        shell: pwsh
+        working-directory: upstream/codex-rs
+        run: |
+          cargo +${{ steps.adapter.outputs.rust }} build --locked --release -p codex-cli --bin codex
+
+      - name: Package and verify
+        shell: pwsh
+        run: |
+          .\scripts\Package-CI.ps1 -Version $env:CODEX_VERSION -UpstreamRoot .\upstream -OutputDirectory .\out
+
+      - name: Attest executable provenance
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
+        with:
+          subject-checksums: out/SHA256SUMS.txt
+
+      - name: Upload verified package
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: codex-zh-${{ env.CODEX_VERSION }}-windows-x64
+          path: out/
+          if-no-files-found: error
+          retention-days: 14

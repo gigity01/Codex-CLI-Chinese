@@ -1,0 +1,16 @@
+{
+  "name": "codex-cli-chinese",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node src/cli.mjs check",
+    "apply": "node src/cli.mjs apply",
+    "test": "node test/run.mjs",
+    "test:powershell": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Test-PowerShell.ps1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
